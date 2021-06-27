@@ -12,7 +12,7 @@ export type Task = {
   id: TaskId
   name: string
   status: TaskStatus
-  assign: PersonId[]
+  assignee?: PersonId
 }
 
 export type EntityMap = {

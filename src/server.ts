@@ -1,12 +1,11 @@
 import { createServer } from 'http'
-import { createEntityClient } from '@phenyl/memory-db'
+import { createEntityClient, PhenylMemoryDbClient } from '@phenyl/memory-db'
 import PhenylRestApi from '@phenyl/rest-api'
 import PhenylHttpServer from '@phenyl/http-server'
 import { FunctionalGroup } from '@phenyl/interfaces'
 import { EntityMap, MyTypeMap } from './type-map'
 
 const serve = async () => {
-  // DBのクライアント
   const entityClient = createEntityClient<EntityMap>()
 
   await entityClient.insertMulti({
@@ -14,24 +13,35 @@ const serve = async () => {
     values: [
       {
         id: 'PID-1',
-        name: 'aoy',
+        name: 'a',
       },
       {
         id: 'PID-2',
-        name: 'ymtt',
+        name: 'b',
       },
     ],
   })
 
-  await entityClient.insertAndGet({
+  await entityClient.insertOne({
     entityName: 'task',
     value: {
       id: 'TID-1',
-      name: 'hands-on',
-      status: 'WIP',
-      assign: [],
+      name: 'Do hands-on',
+      status: 'TODO',
     },
   })
+
+  const persons = await entityClient.find({
+    entityName: 'person',
+    where: {},
+  })
+
+  const tasks = await entityClient.find({
+    entityName: 'task',
+    where: {},
+  })
+
+  console.log(JSON.stringify({ persons, tasks }, null, 2))
 
   const sessionClient = entityClient.createSessionClient()
 
