@@ -1,42 +1,79 @@
 import PhenylHttpClient from '@phenyl/http-client'
-import { MyTypeMap } from './type-map'
+import { LocalState } from '@phenyl/interfaces'
+import { createRedux } from '@phenyl/redux'
+import { createStore, applyMiddleware, combineReducers } from 'redux'
+import { $bind } from 'sp2'
+import { EntityRestInfoMap, MyTypeMap, Task } from './type-map'
 
 const main = async () => {
   const client = new PhenylHttpClient<MyTypeMap>({
     url: 'http://localhost:8080',
   })
 
-  const res = await client.find({
-    entityName: 'person',
-    where: {},
+  const { reducer, middleware, actions } = createRedux({
+    client,
+    storeKey: 'phenyl',
   })
 
-  console.log(JSON.stringify(res, null, 2))
+  const storeEnhancer = applyMiddleware(middleware)
 
-  await client.insertOne({
-    entityName: 'person',
+  const store = createStore<{
+    phenyl: LocalState<EntityRestInfoMap, {}>
+  }>(combineReducers({ phenyl: reducer }), storeEnhancer)
+
+  const defaultTask = await client.insertAndGet({
+    entityName: 'task',
     value: {
-      id: 'PID-3',
-      name: 'mti',
+      id: 'TID-1',
+      name: 'Do hands-on',
+      status: 'TODO',
     },
   })
 
-  const res2 = await client.find({
+  const defaultPersons = await client.insertAndGetMulti({
     entityName: 'person',
-    where: {},
+    values: [
+      {
+        id: 'PID-1',
+        name: 'a',
+      },
+      {
+        id: 'PID-2',
+        name: 'b',
+      },
+    ],
   })
 
-  console.log(JSON.stringify(res2, null, 2))
+  store.dispatch(actions.follow('task', defaultTask.entity, defaultTask.versionId))
 
-  console.log(res.versionsById['PID-1'])
+  store.dispatch(
+    actions.followAll(
+      'person',
+      defaultPersons.entities,
+      defaultPersons.versionsById as Record<string, string>
+    )
+  )
 
-  const res3 = await client.pull({
-    entityName: 'person',
-    id: 'PID-1',
-    versionId: res.versionsById['PID-1'],
-  })
+  const { $set, $path } = $bind<Task>()
 
-  console.log(JSON.stringify(res3, null, 2))
+  const taskUpdate = $set($path('name'), 'TID-1')
+
+  store.dispatch(
+    actions.commitAndPush({
+      entityName: 'task',
+      id: 'TID-2',
+      operation: {
+        $set: {
+          name: 'Create store',
+          status: 'WIP',
+        },
+      },
+    })
+  )
+
+  const state = store.getState().phenyl
+
+  console.log(JSON.stringify(state, null, 2))
 }
 
 main()

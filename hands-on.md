@@ -304,7 +304,7 @@ const functionalGroup: FunctionalGroup<MyTypeMap> = {
 
 ただ、まだこれだけではサーバーとして機能はしません。
 
-## '@phenyl/http-server'
+## `@phenyl/http-server`
 
 次に、`PhenylRestApi` をホストするサーバーを作ります。
 
@@ -331,3 +331,215 @@ console.log('server started')
 ```
 
 サーバー編、完！🎉
+
+## `@phenyl/http-client`
+
+さて、ようやくクライアント編に突入です。
+
+`@phenyl/http-client` を使ってクライアントを実装していきます。
+
+`src/index.ts` にクライアントのコードを書いていきましょう。まずは `PhenylHttpClient` を用意し、`main` 関数作ります。
+
+```ts
+import PhenylHttpClient from '@phenyl/http-client'
+
+const main = async () => {
+  const client = new PhenylHttpClient<MyTypeMap>({
+    url: 'http://localhost:8080',
+  })
+}
+
+main()
+```
+
+これだけで `PhenylHttpClient` の準備は完了です！試しにサーバーから `person` を取得してくるコードを書いてみましょう。
+
+```ts
+const res = await client.find({
+  entityName: 'person',
+  where: {},
+})
+
+console.log(JSON.stringify(res, null, 2))
+```
+
+実際に動かしてみます。`yarn serve` でサーバーを立ち上げてから、`yarn start` してクライアントのログを確認してみましょう。
+
+> ここから先はサーバーは立ち上げたままで良いです。
+
+```json
+{
+  "entities": [
+    {
+      "id": "PID-1",
+      "name": "a"
+    },
+    {
+      "id": "PID-2",
+      "name": "b"
+    }
+  ],
+  "versionsById": {
+    "PID-1": "0kqf5tmou046uG63J7bLLaIk",
+    "PID-2": "0kqf5tmou7IFuCSGeq6Fojav"
+  }
+}
+```
+
+サーバーからデータを取得できました！🎉
+
+では試しに insert もしてみましょう。新たにタスクを追加してみたいと思います。`main` を次のように書き換えます。
+
+```ts
+const main = async () => {
+  const client = new PhenylHttpClient<MyTypeMap>({
+    url: 'http://localhost:8080',
+  })
+
+  await client.insertOne({
+    entityName: 'task',
+    value: {
+      id: 'TID-2',
+      name: 'Implement client',
+      status: 'WIP',
+      assignee: 'PID-1',
+    },
+  })
+
+  const res = await client.find({
+    entityName: 'task',
+    where: {},
+  })
+
+  console.log(JSON.stringify(res, null, 2))
+}
+```
+
+もう一度 `yarn start` してみましょう。
+
+```json
+{
+  "entities": [
+    {
+      "id": "TID-1",
+      "name": "Do hands-on",
+      "status": "TODO"
+    },
+    {
+      "id": "TID-2",
+      "name": "Implement client",
+      "status": "WIP",
+      "assignee": "PID-1"
+    }
+  ],
+  "versionsById": {
+    "TID-1": "0kqf5tmowvzrDtY7VXhdqpQk",
+    "TID-2": "0kqf61ltf8Xm70JHXlwGlrSk"
+  }
+}
+```
+
+`insert` もできました！🎉
+
+次にアップデートもしてみたいと思います。
+
+`"Do hands-on"` のステータスを `WIP` に、`assignee` を `PID-1` にしてみましょう。
+
+```ts
+const main = async () => {
+  const client = new PhenylHttpClient<MyTypeMap>({
+    url: 'http://localhost:8080',
+  })
+
+  await client.updateById({
+    entityName: 'task',
+    id: 'TID-1',
+    operation: {
+      $set: {
+        status: 'WIP',
+        assignee: 'PID-1',
+      },
+    },
+  })
+
+  const res = await client.findOne({
+    entityName: 'task',
+    where: {
+      id: 'TID-1',
+    },
+  })
+
+  console.log(JSON.stringify(res, null, 2))
+}
+```
+
+`operation` はこのように MongoDB 風に書けます。
+
+実行してみます。
+
+```json
+{
+  "entity": {
+    "id": "TID-1",
+    "name": "Do hands-on",
+    "status": "WIP",
+    "assignee": "PID-1"
+  },
+  "versionId": "0kqf88c02feR2S9iKeypDFRa"
+}
+```
+
+`update` もできました！あとは削除もやってみましょう。
+
+先ほど追加した `TID-2` を消してみます。
+
+```ts
+const main = async () => {
+  const client = new PhenylHttpClient<MyTypeMap>({
+    url: 'http://localhost:8080',
+  })
+
+  await client.delete({
+    entityName: 'task',
+    id: 'TID-2',
+  })
+
+  const res = await client.find({
+    entityName: 'task',
+    where: {},
+  })
+
+  console.log(JSON.stringify(res, null, 2))
+}
+```
+
+```json
+{
+  "entities": [
+    {
+      "id": "TID-1",
+      "name": "Do hands-on",
+      "status": "WIP",
+      "assignee": "PID-1"
+    }
+  ],
+  "versionsById": {
+    "TID-1": "0kqf88c02feR2S9iKeypDFRa"
+  }
+}
+```
+
+消えていますね！
+
+## State Synchronization via `@phenyl/redux`
+
+さて、このハンズオンもとうとう最後の章まできました。
+
+最後は `@phenyl/redux` を見ていきます。
+
+`@phenyl/redux` はサーバー/クライアント間の `Git-like` な `synchronization` を実現します。
+
+
+
+
+

@@ -52,6 +52,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["jest", "virtual:fbb3f84e104a1a81044eec20415aaa1858ae2c2338d64e98797d408c3faa38834e6361f5355c4d24c080c3270b6e0e4c42d473dae2812a72a8f0504651614e20#npm:27.0.5"],
             ["prettier", "npm:2.3.1"],
             ["redux", "npm:3.7.2"],
+            ["sp2", "npm:1.6.3"],
             ["ts-jest", "virtual:fbb3f84e104a1a81044eec20415aaa1858ae2c2338d64e98797d408c3faa38834e6361f5355c4d24c080c3270b6e0e4c42d473dae2812a72a8f0504651614e20#npm:27.0.3"],
             ["ts-node", "virtual:fbb3f84e104a1a81044eec20415aaa1858ae2c2338d64e98797d408c3faa38834e6361f5355c4d24c080c3270b6e0e4c42d473dae2812a72a8f0504651614e20#npm:10.0.0"],
             ["typescript", "patch:typescript@npm%3A4.3.4#~builtin<compat/typescript>::version=4.3.4&hash=d8b4e7"]
@@ -5054,6 +5055,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["jest", "virtual:fbb3f84e104a1a81044eec20415aaa1858ae2c2338d64e98797d408c3faa38834e6361f5355c4d24c080c3270b6e0e4c42d473dae2812a72a8f0504651614e20#npm:27.0.5"],
             ["prettier", "npm:2.3.1"],
             ["redux", "npm:3.7.2"],
+            ["sp2", "npm:1.6.3"],
             ["ts-jest", "virtual:fbb3f84e104a1a81044eec20415aaa1858ae2c2338d64e98797d408c3faa38834e6361f5355c4d24c080c3270b6e0e4c42d473dae2812a72a8f0504651614e20#npm:27.0.3"],
             ["ts-node", "virtual:fbb3f84e104a1a81044eec20415aaa1858ae2c2338d64e98797d408c3faa38834e6361f5355c4d24c080c3270b6e0e4c42d473dae2812a72a8f0504651614e20#npm:10.0.0"],
             ["typescript", "patch:typescript@npm%3A4.3.4#~builtin<compat/typescript>::version=4.3.4&hash=d8b4e7"]

@@ -27,7 +27,8 @@
     "@phenyl/memory-db": "^4.0.3",
     "@phenyl/redux": "^4.0.3",
     "@phenyl/rest-api": "^4.0.3",
-    "redux": "^3.7.2"
+    "redux": "^3.7.2",
+    "sp2": "^1.6.3"
   },
   "devDependencies": {
     "@types/jest": "^26.0.23",
