@@ -25,7 +25,6 @@ MongoDB 環境を用意しなくても良いように、今回はより簡単な
 ```ts
 import { createEntityClient } from '@phenyl/memory-db'
 
-// DBクライアント
 const entityClient = createEntityClient()
 ```
 
@@ -63,7 +62,7 @@ export type EntityMap = {
 }
 ```
 
-`src/server.ts` に戻り、この `EntityMap` をインポートして `createEntityClient` の型引数に渡しましょう。そうすることで `entityClient` が扱う `Entity` を明示します
+`src/server.ts` に戻り、この `EntityMap` をインポートして `createEntityClient` の型引数に渡しましょう。そうすることで `entityClient` が扱う `Entity` を明示できます。
 
 ```ts
 const entityClient = createEntityClient<EntityMap>()
@@ -147,7 +146,7 @@ const tasks = await entityClient.find({
 console.log(JSON.stringify({ persons, tasks }, null, 2))
 ```
 
-`yarn serve` を実行します。
+`yarn serve` を実行します。以下のようなログが表示されるはずです。
 
 ```json
 {
@@ -184,10 +183,151 @@ console.log(JSON.stringify({ persons, tasks }, null, 2))
 
 > `versionId` はランダムです。
 
-上記のようなログがでるはずです。追加できてそうですね。🎉
+`Entity` を追加できてそうですね！第一部完！🎉
 
-これで `@phenyl/memory-db` 編はオワリとします。
+> **Note:** 興味のある人は試しに `entityClient` のメソッドをいろいろ試してみてください。
 
-> Note: 試しに `entityClient` のメソッドをいろいろ試してみてもいいかもしれません。
+> **Tips:** 他の Phenyl ファミリーに存在する `entityClient` も基本的に同じような API を持っているため、同じ操作で使う事ができます。
 
-> Tips: 他の Phenyl ファミリーに存在する `entityClient` も基本的に同じような API を持っているため、同じ操作で使う事ができます。
+## `@phenyl/rest-api`
+
+ここまでで `entityClient` を通じた DB 操作を見てきました。次に DB から REST API を作成したいと思います。
+
+Phenyl マナーで REST API 化できる `@phenyl/rest-api` というライブラリを使います。
+
+> これは Phenyl の中でも最もコアとなるライブラリです。
+
+早速、`@phenyl/rest-api` から `PhenylRestApi` をインポートし、先ほどの `serve` 関数の最後に `RestApiHandler` を用意しましょう。
+
+```ts
+const restApiHandler = new PhenylRestApi()
+```
+
+`PhenylRestApi` のコンストラクタの引数の型を見てみましょう。何やら、`FunctionalGroup` というものと `params` が必要なことがわかります。
+
+`params` に `entityClient` と `sessionClient` を渡します。`FunctionalGroup` は次で見ていきましょう。
+
+```ts
+const functionalGroup = {}
+
+const restApiHandler = new PhenylRestApi(functionalGroup, {
+  entityClient,
+  sessionClient: entityClient.createSessionClient(),
+})
+```
+
+## `FunctionalGroup` と `TypeMap`
+
+`FunctionalGroup` とは一体なんでしょうか？ これは `PhenylRestApi` に伝えたいドメインの実装定義...みたいなやつです。よくわからないと思いますが、とりあえず `@phenyl/interfaces` に `FunctionalGroup` の型があるので見てみましょう。
+
+どうやら、`TypeMap` という型引数が必須のようです。この `TypeMap` から見ていきましょう。
+
+### `TypeMap`
+
+`TypeMap` は全ての `Entity` についてのリクエストやレスポンスの型、および Auth に関する情報をまとめた型定義です。
+
+早速 `TypeMap` を定義していきましょう。
+
+`src/type-map.ts` を開き、まずは全ての `Entity` についてのリクエストやレスポンスをまとめた `EntityRestInfoMap` という型を書きます。
+
+```ts
+export type EntityRestInfoMap = {
+  task: {
+    request: Task
+    response: Task
+  }
+  person: {
+    request: Person
+    response: Person
+  }
+}
+```
+
+`task` も `person` もリクエストとレスポンスの型は同じとしたいと思います。
+
+そのような場合は `request` と `response` の二つを定義せずとも、以下のように書けます。
+
+```ts
+export type EntityRestInfoMap = {
+  task: {
+    type: Task
+  }
+  person: {
+    type: Person
+  }
+}
+```
+
+次にこの `EntityRestInfoMap` を使って `TypeMap` を定義しましょう。名前は適当に `MyTypeMap` とします。
+
+> auth やカスタム XXX については今回は考えないこととします。
+
+```ts
+export interface MyTypeMap extends GeneralTypeMap {
+  entities: EntityRestInfoMap
+  customQueries: {}
+  customCommands: {}
+  auths: {}
+}
+```
+
+これで `TypeMap` の定義はできたので改めて `FunctionalGroup` を作っていきます。
+
+### `FunctionalGroup`
+
+`FunctionalGroup` には 4 つのプロパティがあり、それぞれ
+
+- `nonUsers`: `authenticate` 機能を持たない `Entity`
+- `users`: `authenticate` 機能を持つ `Entity`
+- `customQueries`: カスタムクエリ―
+- `customCommands`: カスタムコマンド
+
+です。
+
+今回のタスク管理システムでは、`authenticate` 機能を持つ `Entity` は要らないので、`nonUsers` だけ使います。
+
+> FunctionalGroup の細かい機能についてはここではこれ以上深追いしません。
+
+```ts
+const functionalGroup: FunctionalGroup<MyTypeMap> = {
+  users: {},
+  nonUsers: {
+    person: {},
+    task: {},
+  },
+  customCommands: {},
+  customQueries: {},
+}
+```
+
+`FunctionalGroup` と `TypeMap` を用意し、`PhenylRestApi` の準備までできました！🎉
+
+ただ、まだこれだけではサーバーとして機能はしません。
+
+## '@phenyl/http-server'
+
+次に、`PhenylRestApi` をホストするサーバーを作ります。
+
+シンプルに `Nodejs` の `http` でサーバーを実装する方法の他に、サーバーは `express` で実装し、`Express` の `middleware` として `PhenylRestApi` を動かす方法などもありますが、今回は前者のシンプルな方法で実装することにします。
+
+そのためには `@phenyl/http-server` というライブラリを使います。
+
+`src/server.ts` にて、`http` の `createServer` と `@phenyl/http-server` をインポートします。
+
+```ts
+import { createServer } from 'http'
+import PhenylHttpServer from '@phenyl/http-server'
+```
+
+あとは `serve` 関数の末尾に以下を追記するだけです。🎉
+
+```ts
+// PhenylRestApiをホストするサーバー
+const server = new PhenylHttpServer(createServer(), { restApiHandler })
+
+server.listen(8080)
+
+console.log('server started')
+```
+
+サーバー編、完！🎉

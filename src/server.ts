@@ -1,5 +1,5 @@
 import { createServer } from 'http'
-import { createEntityClient, PhenylMemoryDbClient } from '@phenyl/memory-db'
+import { createEntityClient } from '@phenyl/memory-db'
 import PhenylRestApi from '@phenyl/rest-api'
 import PhenylHttpServer from '@phenyl/http-server'
 import { FunctionalGroup } from '@phenyl/interfaces'
@@ -43,8 +43,6 @@ const serve = async () => {
 
   console.log(JSON.stringify({ persons, tasks }, null, 2))
 
-  const sessionClient = entityClient.createSessionClient()
-
   const functionalGroup: FunctionalGroup<MyTypeMap> = {
     users: {},
     nonUsers: {
@@ -58,7 +56,7 @@ const serve = async () => {
   // PhenylRestApi
   const restApiHandler = new PhenylRestApi(functionalGroup, {
     entityClient,
-    sessionClient,
+    sessionClient: entityClient.createSessionClient(),
   })
 
   // PhenylRestApiをホストするサーバー
