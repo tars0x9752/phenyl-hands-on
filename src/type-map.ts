@@ -5,6 +5,10 @@ export type Person = {
   id: PersonId
   name: string
 }
+export type PersonCollection = {
+  id: string
+  personList: Person[]
+}
 
 export type TaskStatus = 'DONE' | 'WIP' | 'TODO'
 export type TaskId = `TID-${string}`
@@ -14,18 +18,22 @@ export type Task = {
   status: TaskStatus
   assignee?: PersonId
 }
+export type TaskCollection = {
+  id: string
+  taskList: Task[]
+}
 
 export type EntityMap = {
-  task: Task
-  person: Person
+  taskCollection: TaskCollection
+  personCollection: PersonCollection
 }
 
 export type EntityRestInfoMap = {
-  task: {
-    type: Task
+  taskCollection: {
+    type: TaskCollection
   }
-  person: {
-    type: Person
+  personCollection: {
+    type: PersonCollection
   }
 }
 

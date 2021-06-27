@@ -51,7 +51,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["eslint-plugin-prettier", "virtual:fbb3f84e104a1a81044eec20415aaa1858ae2c2338d64e98797d408c3faa38834e6361f5355c4d24c080c3270b6e0e4c42d473dae2812a72a8f0504651614e20#npm:3.4.0"],
             ["jest", "virtual:fbb3f84e104a1a81044eec20415aaa1858ae2c2338d64e98797d408c3faa38834e6361f5355c4d24c080c3270b6e0e4c42d473dae2812a72a8f0504651614e20#npm:27.0.5"],
             ["prettier", "npm:2.3.1"],
-            ["redux", "npm:3.7.2"],
+            ["redux", "npm:4.1.0"],
             ["sp2", "npm:1.6.3"],
             ["ts-jest", "virtual:fbb3f84e104a1a81044eec20415aaa1858ae2c2338d64e98797d408c3faa38834e6361f5355c4d24c080c3270b6e0e4c42d473dae2812a72a8f0504651614e20#npm:27.0.3"],
             ["ts-node", "virtual:fbb3f84e104a1a81044eec20415aaa1858ae2c2338d64e98797d408c3faa38834e6361f5355c4d24c080c3270b6e0e4c42d473dae2812a72a8f0504651614e20#npm:10.0.0"],
@@ -785,6 +785,16 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packagePeers": [
             "@babel/core",
             "@types/babel__core"
+          ],
+          "linkType": "HARD",
+        }]
+      ]],
+      ["@babel/runtime", [
+        ["npm:7.14.6", {
+          "packageLocation": "./.yarn/cache/@babel-runtime-npm-7.14.6-3272013297-927ffed787.zip/node_modules/@babel/runtime/",
+          "packageDependencies": [
+            ["@babel/runtime", "npm:7.14.6"],
+            ["regenerator-runtime", "npm:0.13.8"]
           ],
           "linkType": "HARD",
         }]
@@ -4520,15 +4530,6 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "linkType": "HARD",
         }]
       ]],
-      ["lodash-es", [
-        ["npm:4.17.21", {
-          "packageLocation": "./.yarn/cache/lodash-es-npm-4.17.21-b45832dfce-05cbffad6e.zip/node_modules/lodash-es/",
-          "packageDependencies": [
-            ["lodash-es", "npm:4.17.21"]
-          ],
-          "linkType": "HARD",
-        }]
-      ]],
       ["lodash.clonedeep", [
         ["npm:4.5.0", {
           "packageLocation": "./.yarn/cache/lodash.clonedeep-npm-4.5.0-fbc3cda4e5-92c46f094b.zip/node_modules/lodash.clonedeep/",
@@ -4552,16 +4553,6 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./.yarn/cache/lodash.truncate-npm-4.4.2-bc50fe1663-b463d8a382.zip/node_modules/lodash.truncate/",
           "packageDependencies": [
             ["lodash.truncate", "npm:4.4.2"]
-          ],
-          "linkType": "HARD",
-        }]
-      ]],
-      ["loose-envify", [
-        ["npm:1.4.0", {
-          "packageLocation": "./.yarn/cache/loose-envify-npm-1.4.0-6307b72ccf-6517e24e0c.zip/node_modules/loose-envify/",
-          "packageDependencies": [
-            ["loose-envify", "npm:1.4.0"],
-            ["js-tokens", "npm:4.0.0"]
           ],
           "linkType": "HARD",
         }]
@@ -5054,7 +5045,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["eslint-plugin-prettier", "virtual:fbb3f84e104a1a81044eec20415aaa1858ae2c2338d64e98797d408c3faa38834e6361f5355c4d24c080c3270b6e0e4c42d473dae2812a72a8f0504651614e20#npm:3.4.0"],
             ["jest", "virtual:fbb3f84e104a1a81044eec20415aaa1858ae2c2338d64e98797d408c3faa38834e6361f5355c4d24c080c3270b6e0e4c42d473dae2812a72a8f0504651614e20#npm:27.0.5"],
             ["prettier", "npm:2.3.1"],
-            ["redux", "npm:3.7.2"],
+            ["redux", "npm:4.1.0"],
             ["sp2", "npm:1.6.3"],
             ["ts-jest", "virtual:fbb3f84e104a1a81044eec20415aaa1858ae2c2338d64e98797d408c3faa38834e6361f5355c4d24c080c3270b6e0e4c42d473dae2812a72a8f0504651614e20#npm:27.0.3"],
             ["ts-node", "virtual:fbb3f84e104a1a81044eec20415aaa1858ae2c2338d64e98797d408c3faa38834e6361f5355c4d24c080c3270b6e0e4c42d473dae2812a72a8f0504651614e20#npm:10.0.0"],
@@ -5328,14 +5319,20 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         }]
       ]],
       ["redux", [
-        ["npm:3.7.2", {
-          "packageLocation": "./.yarn/cache/redux-npm-3.7.2-0f79fccafa-c349b77e68.zip/node_modules/redux/",
+        ["npm:4.1.0", {
+          "packageLocation": "./.yarn/cache/redux-npm-4.1.0-0f422e2fac-322d5f4b49.zip/node_modules/redux/",
           "packageDependencies": [
-            ["redux", "npm:3.7.2"],
-            ["lodash", "npm:4.17.21"],
-            ["lodash-es", "npm:4.17.21"],
-            ["loose-envify", "npm:1.4.0"],
-            ["symbol-observable", "npm:1.2.0"]
+            ["redux", "npm:4.1.0"],
+            ["@babel/runtime", "npm:7.14.6"]
+          ],
+          "linkType": "HARD",
+        }]
+      ]],
+      ["regenerator-runtime", [
+        ["npm:0.13.8", {
+          "packageLocation": "./.yarn/cache/regenerator-runtime-npm-0.13.8-0450f887d6-5f89699ab5.zip/node_modules/regenerator-runtime/",
+          "packageDependencies": [
+            ["regenerator-runtime", "npm:0.13.8"]
           ],
           "linkType": "HARD",
         }]
@@ -5799,15 +5796,6 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["supports-hyperlinks", "npm:2.2.0"],
             ["has-flag", "npm:4.0.0"],
             ["supports-color", "npm:7.2.0"]
-          ],
-          "linkType": "HARD",
-        }]
-      ]],
-      ["symbol-observable", [
-        ["npm:1.2.0", {
-          "packageLocation": "./.yarn/cache/symbol-observable-npm-1.2.0-9e812a0a39-48ffbc22e3.zip/node_modules/symbol-observable/",
-          "packageDependencies": [
-            ["symbol-observable", "npm:1.2.0"]
           ],
           "linkType": "HARD",
         }]

@@ -8,11 +8,42 @@ import { EntityMap, MyTypeMap } from './type-map'
 const serve = async () => {
   const entityClient = createEntityClient<EntityMap>()
 
+  await entityClient.insertOne({
+    entityName: 'taskCollection',
+    value: {
+      id: 'task-collection-1',
+      taskList: [
+        {
+          id: 'TID-1',
+          name: 'Do hands-on',
+          status: 'TODO',
+        },
+      ],
+    },
+  })
+
+  await entityClient.insertOne({
+    entityName: 'personCollection',
+    value: {
+      id: 'person-collection-1',
+      personList: [
+        {
+          id: 'PID-1',
+          name: 'a',
+        },
+        {
+          id: 'PID-2',
+          name: 'b',
+        },
+      ],
+    },
+  })
+
   const functionalGroup: FunctionalGroup<MyTypeMap> = {
     users: {},
     nonUsers: {
-      person: {},
-      task: {},
+      personCollection: {},
+      taskCollection: {},
     },
     customCommands: {},
     customQueries: {},

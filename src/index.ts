@@ -1,9 +1,9 @@
 import PhenylHttpClient from '@phenyl/http-client'
-import { LocalState } from '@phenyl/interfaces'
+import { ActionWithTypeMap, EntityNameOf, LocalState, UserEntityNameOf } from '@phenyl/interfaces'
 import { createRedux } from '@phenyl/redux'
 import { createStore, applyMiddleware, combineReducers } from 'redux'
 import { $bind } from 'sp2'
-import { EntityRestInfoMap, MyTypeMap, Task } from './type-map'
+import { EntityRestInfoMap, MyTypeMap, TaskCollection } from './type-map'
 
 const main = async () => {
   const client = new PhenylHttpClient<MyTypeMap>({
@@ -17,63 +17,73 @@ const main = async () => {
 
   const storeEnhancer = applyMiddleware(middleware)
 
-  const store = createStore<{
-    phenyl: LocalState<EntityRestInfoMap, {}>
-  }>(combineReducers({ phenyl: reducer }), storeEnhancer)
+  const store = createStore<
+    {
+      phenyl: LocalState<EntityRestInfoMap, {}>
+    },
+    ActionWithTypeMap<MyTypeMap, EntityNameOf<MyTypeMap>, UserEntityNameOf<MyTypeMap>>,
+    {},
+    {}
+  >(combineReducers({ phenyl: reducer }), storeEnhancer)
 
-  const defaultTask = await client.insertAndGet({
-    entityName: 'task',
+  const defaultPersons = await client.insertAndGet({
+    entityName: 'personCollection',
     value: {
-      id: 'TID-1',
-      name: 'Do hands-on',
-      status: 'TODO',
+      id: 'person-collection-1',
+      personList: [
+        {
+          id: 'PID-1',
+          name: 'a',
+        },
+        {
+          id: 'PID-2',
+          name: 'b',
+        },
+      ],
     },
   })
 
-  const defaultPersons = await client.insertAndGetMulti({
-    entityName: 'person',
-    values: [
-      {
-        id: 'PID-1',
-        name: 'a',
-      },
-      {
-        id: 'PID-2',
-        name: 'b',
-      },
-    ],
+  const defaultTasks = await client.insertAndGet({
+    entityName: 'taskCollection',
+    value: {
+      id: 'task-collection-1',
+      taskList: [
+        {
+          id: 'TID-1',
+          name: 'Do hands-on',
+          status: 'TODO',
+        },
+      ],
+    },
   })
 
-  store.dispatch(actions.follow('task', defaultTask.entity, defaultTask.versionId))
-
-  store.dispatch(
-    actions.followAll(
-      'person',
-      defaultPersons.entities,
-      defaultPersons.versionsById as Record<string, string>
-    )
+  await store.dispatch(
+    actions.follow('personCollection', defaultPersons.entity, defaultPersons.versionId)
   )
 
-  const { $set, $path } = $bind<Task>()
+  await store.dispatch(
+    actions.follow('taskCollection', defaultTasks.entity, defaultTasks.versionId)
+  )
 
-  const taskUpdate = $set($path('name'), 'TID-1')
+  const { $push, $path } = $bind<TaskCollection>()
 
-  store.dispatch(
+  const addTaskOp = $push($path('taskList'), {
+    id: 'TID-2',
+    name: 'Create store',
+    status: 'WIP',
+  })
+
+  await store.dispatch(
     actions.commitAndPush({
-      entityName: 'task',
-      id: 'TID-2',
-      operation: {
-        $set: {
-          name: 'Create store',
-          status: 'WIP',
-        },
-      },
+      entityName: 'taskCollection',
+      id: 'task-collection-1',
+      operation: addTaskOp,
     })
   )
 
   const state = store.getState().phenyl
 
-  console.log(JSON.stringify(state, null, 2))
+  console.log(JSON.stringify(state.entities, null, 2))
 }
 
 main()
