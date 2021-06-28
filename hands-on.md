@@ -1,10 +1,10 @@
 # Phenyl ハンズオン
 
-Phenyl は複数のライブラリからなるライブラリ**群**です。
+Phenyl は複数のライブラリからなるライブラリ**群**として提供されます。
 
 ライブラリの数は軽く 10 個を超え、どこから手を付けて良いかわからないかもしれません。
 
-このハンズオンではその中からコアなライブラリ数個を厳選して触っていき、Phenyl の概要をなんとなく理解することを目指します。
+このハンズオンではコアなライブラリ数個を厳選して触っていき、Phenyl の概要をなんとなく理解することを目指します。
 
 ## はじめの一歩
 
@@ -28,7 +28,9 @@ import { createEntityClient } from '@phenyl/memory-db'
 const entityClient = createEntityClient()
 ```
 
-`Phenyl` の世界で言う `Entity` とは、MongoDB にドキュメントとして保存される、 `id` により同一性を持つオブジェクトを指します。別の言い方をするとコレクションのスキーマ、あるいは RDB の ORM で言うところの **テーブルスキーマモデルみたいなもの** と思うとわかりやすいかもしれません。
+`Phenyl` の世界で言う `Entity` とは、MongoDB にドキュメントとして保存される、 `id` により同一性を持つオブジェクトを指します。
+
+コレクションのスキーマ、あるいは RDB の ORM で言うところの **テーブルスキーマモデルみたいなもの** と思うとわかりやすいかもしれません。
 
 > 混乱を避けるため、必ずしも 「DDD のエンティティ = `Phenyl` の `Entity`」 ではないということを明示的に書いておきます。
 
@@ -40,23 +42,28 @@ const entityClient = createEntityClient()
 
 ```ts
 export type PersonId = `PID-${string}`
+
 export type Person = {
   id: PersonId
   name: string
 }
+
 export type PersonCollection = {
   id: string
   personList: Person[]
 }
 
 export type TaskStatus = 'DONE' | 'WIP' | 'TODO'
+
 export type TaskId = `TID-${string}`
+
 export type Task = {
   id: TaskId
   name: string
   status: TaskStatus
   assignee?: PersonId
 }
+
 export type TaskCollection = {
   id: string
   taskList: Task[]
@@ -223,8 +230,6 @@ console.log(JSON.stringify({ personCollection, taskCollection }, null, 2))
 ここまでで `entityClient` を通じた DB 操作を見てきました。次に DB から REST API を作成したいと思います。
 
 Phenyl マナーで REST API 化できる `@phenyl/rest-api` というライブラリを使います。
-
-> これは Phenyl の中でも最もコアとなるライブラリです。
 
 早速、`@phenyl/rest-api` から `PhenylRestApi` をインポートし、先ほどの `serve` 関数の最後に `RestApiHandler` を用意しましょう。
 
@@ -599,7 +604,7 @@ const main = async () => {
 
 最後は `@phenyl/redux` を見ていきます。
 
-`@phenyl/redux` は、DB と redux の store との間で `Git-like` な操作で状態の同期を可能にしてくれるライブラリです。
+`@phenyl/redux` は、`Git-like` な操作で DB/Redux Store 間の state の同期を手助けしてくれるライブラリです。
 
 ### 掃除
 
@@ -684,7 +689,7 @@ const store = createStore<
 
 ### Phenyl Actions
 
-早速、store に Phenyl が用意してくれた Action を Dispatch してみましょう。
+早速、Phenyl が用意してくれた Action を store に Dispatch してみましょう。
 
 `main` に以下を追記します。
 
@@ -733,7 +738,7 @@ console.log(JSON.stringify(state.entities, null, 2))
 
 httpClient で `person-collection-1` と `task-collection-1` をサーバーに投げ、`follow` action をディスパッチすることでクライアントの store にも同じエンティティを保存しています。
 
-実際に実行して store の状態を確認してみましょう。
+実行して store の状態を確認してみましょう。
 
 ```json
 {
@@ -785,9 +790,9 @@ store に入ってますね！
 
 ここで、`phenyl` という名前はついてないものの `phenyl` ファミリーの一部である、 `sp2` というライブラリを紹介します。
 
-これは MongoDB ライクな書き方でオブジェクトをどのように更新するかのオペレーションを作ることができるライブライです。
+これは MongoDB ライクな書き方でオブジェクトをどのように更新するかのオペレーションを作ることができるライブラリです。
 
-> また、必要であれば `update` 関数を使って実際にオブジェクトを immutable に更新することもできます。
+> また、必要であれば `update` 関数を使ってオブジェクトを immutable に更新することもできます。
 
 ここでは `sp2` を使ってタスクを新たに追加するというオペレーションを書いてみます。
 
@@ -803,9 +808,9 @@ const addTaskOp = $push($path('taskList'), {
 })
 ```
 
-`$push` は配列に新たに要素を追加するオペレーションです。
+これは `taskList` に `Create store` というタスクを追加するというオペレーションです。
 
-> その他のオペレーションについて知りたい場合は MongoDB のドキュメントを読むとよいです。
+> `$push` は配列に新たに要素を追加するオペレーションです。その他のオペレーションについて知りたい場合は MongoDB のドキュメントを読むとよいです。
 
 ### `commitAndPush`
 
@@ -923,8 +928,12 @@ const main = async () => {
 }
 ```
 
-サーバー側も更新されてそうです。
+サーバー側も更新されてますね！
 
 ## おわり
 
-力尽きたのでここでオワリにします。
+ざっくりと `@phenyl/memory-db` から `@phenyl/redux` までを見てきました。
+
+`Auth` やカスタムコマンド/カスタムクエリについては一切触れていないですが、なんとなくの雰囲気は掴めたでしょうか。
+
+これでハンズオンは終わります。乙でした。

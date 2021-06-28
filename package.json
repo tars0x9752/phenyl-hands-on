@@ -8,17 +8,13 @@
     "lib/**/*"
   ],
   "scripts": {
+    "clean": "cat /dev/null > src/client.ts && cat /dev/null > src/server.ts && cat /dev/null > src/type-map.ts",
     "client": "ts-node src/client.ts",
     "serve": "ts-node src/server.ts",
     "build": "tsc",
     "format": "prettier --write \"src/**/*.ts\"",
     "lint": "eslint . --ext .ts,.tsx",
-    "test": "jest --verbose",
-    "prepare": "npm run build",
-    "prepublishOnly": "npm test && npm run lint",
-    "preversion": "npm run lint",
-    "version": "npm run format && git add -A src",
-    "postversion": "git push && git push --tags"
+    "test": "jest --verbose"
   },
   "dependencies": {
     "@phenyl/http-client": "^4.0.3",

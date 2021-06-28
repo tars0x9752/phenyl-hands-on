@@ -1,17 +1,37 @@
-# npm-typescript-package-starter
+# Phenyl-Hands-On
 
-A personal TypeScript package starter with yarn berry 2 boilerplate.
+これは初めて Phenyl 触る方向けのハンズオン用リポジトリです。
 
-## Includes
+## 必要なもの
 
-- Prettier
-- ESLint
-- Jest
+- VSCode
+- yarn v1.22.10
 
-## What to do first
+## ハンズオンの準備
 
-~~Install devDependencies with the command `yarn install`~~.
+**手順1:** まずはこのリポジトリを `git clone` してください。
+ 
+このリポジトリは yarn の Plug'n'Play で作っており、最初から必要な依存関係は全て入っています。
 
-Actually, No. This template uses yarn v2 Plug'n'Play which means initial `yarn install` is no longer necessary.
+Zero-Installs、**つまり `yarn` あるいは `yarn install` をする必要はありません。**
 
-And, Don't forget to enter the `name`, `description` and `repository.url` into package.json. Once you've done that, you can start writing code. 👍
+**手順2:** VSCode でこのリポジトリを開きます。
+
+**手順3:** 何でもよいので `src/` 配下の`.ts` ファイルを開いてください。
+
+ワークスペースの`TypeScript`を使用することの許可を求められるので許可してください。（初回の一度だけです。）
+
+**手順4:** `.ts` ファイルを開いた状態でコマンドパレットを`ctrl+shift+p`（あるいは`cmd+shift+p`）で開き、`Select TypeScript Version` を実行して `Use Workspace Version` を選択してください。
+
+> pnpify された TS を VSCode にインテグレーションするための準備です。
+
+### 補足
+
+- ハンズオンを通してパッケージを `yarn add` する必要はありません。必要なものはすべて最初から入っています。
+- yarn 3 がこのリポジトリに入っています。あなたのグローバル環境の yarn のバージョンに関わらず、このリポジトリ内で `yarn --version` をすると `v3.0.0` 系のバージョンが表示されるはずです。
+
+## ハンズオンを始める
+
+準備は以上で完了です。以下からハンズオンを始ることができます。
+
+[hands-on.md](hands-on.md)
