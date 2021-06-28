@@ -16,7 +16,7 @@
 
 このリポジトリは yarn の Plug'n'Play で作っており、最初から必要な依存関係は全て入っています。
 
-Zero-Installs、**つまり `yarn` あるいは `yarn install` をする必要はありません。**
+**つまり `yarn` あるいは `yarn install` をする必要はありません。**
 
 ### 手順 2
 
