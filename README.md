@@ -10,19 +10,27 @@
 
 ## ハンズオンの準備
 
-**手順1:** まずはこのリポジトリを `git clone` してください。
- 
+### 手順 1
+
+まずはこのリポジトリを `git clone` してください。
+
 このリポジトリは yarn の Plug'n'Play で作っており、最初から必要な依存関係は全て入っています。
 
 Zero-Installs、**つまり `yarn` あるいは `yarn install` をする必要はありません。**
 
-**手順2:** VSCode でこのリポジトリを開きます。
+### 手順 2
 
-**手順3:** 何でもよいので `src/` 配下の`.ts` ファイルを開いてください。
+VSCode でこのリポジトリを開きます。
+
+### 手順 3
+
+何でもよいので `src/` 配下の`.ts` ファイルを開いてください。
 
 ワークスペースの`TypeScript`を使用することの許可を求められるので許可してください。（初回の一度だけです。）
 
-**手順4:** `.ts` ファイルを開いた状態でコマンドパレットを`ctrl+shift+p`（あるいは`cmd+shift+p`）で開き、`Select TypeScript Version` を実行して `Use Workspace Version` を選択してください。
+### 手順 4
+
+`.ts` ファイルを開いた状態でコマンドパレットを`ctrl+shift+p`（あるいは`cmd+shift+p`）で開き、`Select TypeScript Version` を実行して `Use Workspace Version` を選択してください。
 
 > pnpify された TS を VSCode にインテグレーションするための準備です。
 
@@ -35,6 +43,6 @@ Zero-Installs、**つまり `yarn` あるいは `yarn install` をする必要�
 
 `src/` 配下にほぼ完成した状態のコードがあります。ですが、一から自分でコードを書いていきたい場合は `yarn clear` してください。`src/` 配下のファイルを空にできます。
 
-準備は以上で完了です。以下からハンズオンを始ることができます。
+準備は以上で完了です。以下からハンズオンを開始できます。
 
 [hands-on.md](hands-on.md)
