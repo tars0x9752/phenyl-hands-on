@@ -814,7 +814,7 @@ const addTaskOp = $push($path('taskList'), {
 
 ### `commitAndPush`
 
-それでは、実際にオペレーションを store に適用したいと思います。ここで、store だけでなくサーバー側にもその操作を同期したい場合はどうすればいいでしょうか？
+それでは、この `addTaskOp` を使って store の状態を更新したいと思います。ここで、store だけでなくサーバー側にもその操作を同期したい場合はどうすればいいでしょうか？
 
 `commitAndPush` という Phenyl Action を使ってみましょう。store を更新すると同時にサーバー側へも push することができます。
 
@@ -938,4 +938,4 @@ const main = async () => {
 
 これでハンズオンは終わります。
 
-*Goodbye* 👋 
+_Goodbye_ 👋
