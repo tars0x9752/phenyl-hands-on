@@ -8,7 +8,7 @@
     "lib/**/*"
   ],
   "scripts": {
-    "clean": "cat /dev/null > src/client.ts && cat /dev/null > src/server.ts && cat /dev/null > src/type-map.ts",
+    "clear": "cat /dev/null > src/*.ts",
     "client": "ts-node src/client.ts",
     "serve": "ts-node src/server.ts",
     "build": "tsc",
