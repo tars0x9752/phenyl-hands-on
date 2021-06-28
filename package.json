@@ -1,7 +1,7 @@
 {
-  "name": "package-name",
+  "name": "phenyl-hands-on",
   "version": "1.0.0",
-  "description": "description",
+  "description": "phenyl-hands-on",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
   "files": [
@@ -43,7 +43,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "repository url goes here"
+    "url": "https://github.com/tars0x9752/phenyl-hands-on"
   },
   "author": "tars0x9752",
   "license": "MIT"
