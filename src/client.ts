@@ -83,7 +83,7 @@ const main = async () => {
 
   const state = store.getState().phenyl
 
-  console.log(JSON.stringify(state.entities, null, 2))
+  console.log(JSON.stringify(state.entities.taskCollection, null, 2))
 }
 
 main()

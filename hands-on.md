@@ -28,11 +28,13 @@ import { createEntityClient } from '@phenyl/memory-db'
 const entityClient = createEntityClient()
 ```
 
-`Phenyl` の世界で言う `Entity` とは、`id` を持つオブジェクトのことです。
+`Phenyl` の世界で言う `Entity` とは、MongoDB にドキュメントとして保存される、 `id` により同一性を持つオブジェクトを指します。別の言い方をするとコレクションのスキーマ、あるいは RDB の ORM で言うところの **テーブルスキーマモデルみたいなもの** と思うとわかりやすいかもしれません。
+
+> 混乱を避けるため、必ずしも 「DDD のエンティティ = `Phenyl` の `Entity`」 ではないということを明示的に書いておきます。
 
 このハンズオンでは例としてタスク管理システムを作っていくことにします。
 
-タスク管理システムの `Entity` として `TaskCollection` と `PersonCollection` があるとします。（この辺の設定はテキトーで深い意味はありません。）
+タスク管理システムの `Entity` として `TaskCollection` と `PersonCollection` があるとします。（この辺の設定はテキトーです。）
 
 `src/type-map.ts` を開き、以下のように `Task` と `Person` の型を定義しましょう。
 
@@ -62,6 +64,8 @@ export type TaskCollection = {
 ```
 
 次に `entityClient` で管理したい `Entity` 全てを列挙した `EntityMap` を定義します。ここでは、`taskCollection` と `personCollection` の二つの `Entity` があるので、これらを `EntityMap` に書きます。
+
+> EntityMap ≒ MongoDB のコレクションの一覧と思うと理解しやすいかもしれません。
 
 ```ts
 export type EntityMap = {
@@ -98,8 +102,6 @@ entityClient.insertOne({
   },
 })
 ```
-
-> このハンズオンの執筆時点ではまだ `id` の型推論は `template literal types` に対応しておらず強制的に `string` になってしまうようです。(無念)
 
 `entityClient` の諸々のメソッドは非同期なので、ここで一連のコードを `async` 関数にまとめることにしましょう。ゆくゆくはサーバーにしたいので、`serve` と名付けることにします。
 
@@ -151,17 +153,17 @@ await entityClient.insertOne({
 `find` で `DB` が保持している `Entity` を検索できます。
 
 ```ts
-const persons = await entityClient.find({
-  entityName: 'person',
+const personCollection = await entityClient.find({
+  entityName: 'personCollection',
   where: {},
 })
 
-const tasks = await entityClient.find({
-  entityName: 'task',
+const taskCollection = await entityClient.find({
+  entityName: 'taskCollection',
   where: {},
 })
 
-console.log(JSON.stringify({ persons, tasks }, null, 2))
+console.log(JSON.stringify({ personCollection, taskCollection }, null, 2))
 ```
 
 `yarn serve` を実行します。以下のようなログが表示されるはずです。
@@ -232,7 +234,7 @@ const restApiHandler = new PhenylRestApi()
 
 `PhenylRestApi` のコンストラクタの引数の型を見てみましょう。何やら、`FunctionalGroup` というものと `params` が必要なことがわかります。
 
-`params` に `entityClient` と `sessionClient` を渡します。`FunctionalGroup` は次で見ていきましょう。
+`params` には `entityClient` と `sessionClient` を渡します。`FunctionalGroup` は仮置きして次で見ていきましょう。
 
 ```ts
 const functionalGroup = {}
@@ -245,7 +247,7 @@ const restApiHandler = new PhenylRestApi(functionalGroup, {
 
 ## `FunctionalGroup` と `TypeMap`
 
-`FunctionalGroup` とは一体なんでしょうか？ これは `PhenylRestApi` に伝えたいドメインの実装定義...みたいなやつです。よくわからないと思いますが、とりあえず `@phenyl/interfaces` に `FunctionalGroup` の型があるので見てみましょう。
+`FunctionalGroup` とは一体なんでしょうか？ これは `PhenylRestApi` の各機能の実装...みたいなやつです。とりあえず `@phenyl/interfaces` に `FunctionalGroup` の型があるので見てみましょう。
 
 どうやら、`TypeMap` という型引数が必須のようです。この `TypeMap` から見ていきましょう。
 
@@ -270,7 +272,7 @@ export type EntityRestInfoMap = {
 }
 ```
 
-`task` も `person` もリクエストとレスポンスの型は同じとしたいと思います。
+`taskCollection` も `personCollection` もリクエストとレスポンスの型は同じとしたいと思います。
 
 そのような場合は `request` と `response` の二つを定義せずとも、以下のように書けます。
 
@@ -306,14 +308,14 @@ export interface MyTypeMap extends GeneralTypeMap {
 
 - `nonUsers`: `authenticate` 機能を持たない `Entity`
 - `users`: `authenticate` 機能を持つ `Entity`
-- `customQueries`: カスタムクエリ―
-- `customCommands`: カスタムコマンド
+- `customQueries`: カスタムクエリ―。副作用のない処理。
+- `customCommands`: カスタムコマンド。副作用のある処理。
 
 です。
 
 今回のタスク管理システムでは、`authenticate` 機能を持つ `Entity` は要らないので、`nonUsers` だけ使います。
 
-> FunctionalGroup の細かい機能についてはここではこれ以上深追いしません。
+> FunctionalGroup の細かい機能についてはここではこれ以上深追いしませんが、気になる方は型定義を除いてみてください。
 
 ```ts
 const functionalGroup: FunctionalGroup<MyTypeMap> = {
@@ -365,7 +367,7 @@ console.log('server started')
 
 `@phenyl/http-client` を使ってクライアントを実装していきます。
 
-`src/index.ts` にクライアントのコードを書いていきましょう。まずは `PhenylHttpClient` を用意し、`main` 関数作ります。
+`src/client.ts` にクライアントのコードを書いていきましょう。まずは `PhenylHttpClient` を用意し、`main` 関数作ります。
 
 ```ts
 import PhenylHttpClient from '@phenyl/http-client'
@@ -390,7 +392,7 @@ const res = await client.find({
 console.log(JSON.stringify(res, null, 2))
 ```
 
-実際に動かしてみます。`yarn serve` でサーバーを立ち上げてから、`yarn start` してクライアントのログを確認してみましょう。
+実際に動かしてみます。`yarn serve` でサーバーを立ち上げてから、`yarn client` してクライアントを動かしてみましょう。
 
 > ここから先はサーバーは立ち上げたままで良いです。
 
@@ -453,7 +455,7 @@ const main = async () => {
 
 `operation` はこのように MongoDB 風に書けます。
 
-もう一度 `yarn start` してみましょう。
+もう一度 `yarn client` してみましょう。
 
 ```json
 {
@@ -597,7 +599,7 @@ const main = async () => {
 
 最後は `@phenyl/redux` を見ていきます。
 
-`@phenyl/redux` はサーバーの DB とクライアントの store 間で `Git-like` な `synchronization` を実現します。
+`@phenyl/redux` は、DB と redux の store との間で `Git-like` な操作で状態の同期を可能にしてくれるライブラリです。
 
 ### 掃除
 
@@ -632,7 +634,7 @@ const serve = async () => {
 }
 ```
 
-また、`src/index.ts` についても `client` のメソッドを呼んでいた箇所をまるっと消してしまいましょう。
+また、`src/client.ts` についても `client` のメソッドを呼んでいた箇所をまるっと消してしまいましょう。
 
 ```ts
 const main = async () => {
@@ -646,7 +648,7 @@ const main = async () => {
 
 `store` を作っていきます。
 
-`src/index.ts` に以下をインポートします。
+`src/client.ts` に以下をインポートします。
 
 ```ts
 import { createRedux } from '@phenyl/redux'
@@ -674,4 +676,255 @@ const store = createStore<
 >(combineReducers({ phenyl: reducer }), storeEnhancer)
 ```
 
+`createRedux` の `reducer` は Phenyl の `actions` に対応するものです。`actions` は store を作るだけなら不要ですが、あとで store に対して Phenyl の Action を Dispatch するときに使うのでこれも用意しておきましょう。
+
+> 自前の reducer が他にある場合は、`combineReducer` で combine しましょう。
+
 これで store の準備ができました。
+
+### Phenyl Actions
+
+早速、store に Phenyl が用意してくれた Action を Dispatch してみましょう。
+
+`main` に以下を追記します。
+
+```ts
+const defaultPersons = await client.insertAndGet({
+  entityName: 'personCollection',
+  value: {
+    id: 'person-collection-1',
+    personList: [
+      {
+        id: 'PID-1',
+        name: 'a',
+      },
+      {
+        id: 'PID-2',
+        name: 'b',
+      },
+    ],
+  },
+})
+
+const defaultTasks = await client.insertAndGet({
+  entityName: 'taskCollection',
+  value: {
+    id: 'task-collection-1',
+    taskList: [
+      {
+        id: 'TID-1',
+        name: 'Do hands-on',
+        status: 'TODO',
+      },
+    ],
+  },
+})
+
+await store.dispatch(
+  actions.follow('personCollection', defaultPersons.entity, defaultPersons.versionId)
+)
+
+await store.dispatch(actions.follow('taskCollection', defaultTasks.entity, defaultTasks.versionId))
+
+const state = store.getState().phenyl
+
+console.log(JSON.stringify(state.entities, null, 2))
+```
+
+httpClient で `person-collection-1` と `task-collection-1` をサーバーに投げ、`follow` action をディスパッチすることでクライアントの store にも同じエンティティを保存しています。
+
+実際に実行して store の状態を確認してみましょう。
+
+```json
+{
+  "personCollection": {
+    "person-collection-1": {
+      "origin": {
+        "id": "person-collection-1",
+        "personList": [
+          {
+            "id": "PID-1",
+            "name": "a"
+          },
+          {
+            "id": "PID-2",
+            "name": "b"
+          }
+        ]
+      },
+      "versionId": "0kqgim0afeHuq5KVsyktbNRw",
+      "commits": [],
+      "head": null
+    }
+  },
+  "taskCollection": {
+    "task-collection-1": {
+      "origin": {
+        "id": "task-collection-1",
+        "taskList": [
+          {
+            "id": "TID-1",
+            "name": "Do hands-on",
+            "status": "TODO"
+          }
+        ]
+      },
+      "versionId": "0kqgim0ap5lcH5jVl96FY3Fi",
+      "commits": [],
+      "head": null
+    }
+  }
+}
+```
+
+store に入ってますね！
+
+### `sp2`
+
+次に、タスクを新たに追加してみたいと思います。
+
+ここで、`phenyl` という名前はついてないものの `phenyl` ファミリーの一部である、 `sp2` というライブラリを紹介します。
+
+これは MongoDB ライクな書き方でオブジェクトをどのように更新するかのオペレーションを作ることができるライブライです。
+
+> また、必要であれば `update` 関数を使って実際にオブジェクトを immutable に更新することもできます。
+
+ここでは `sp2` を使ってタスクを新たに追加するというオペレーションを書いてみます。
+
+`$bind` を `sp2` からインポートし、以下を追記しましょう。
+
+```ts
+const { $push, $path } = $bind<TaskCollection>()
+
+const addTaskOp = $push($path('taskList'), {
+  id: 'TID-2',
+  name: 'Create store',
+  status: 'WIP',
+})
+```
+
+`$push` は配列に新たに要素を追加するオペレーションです。
+
+> その他のオペレーションについて知りたい場合は MongoDB のドキュメントを読むとよいです。
+
+### `commitAndPush`
+
+それでは、実際にオペレーションを store に適用したいと思います。ここで、store だけでなくサーバー側にもその操作を同期したい場合はどうすればいいでしょうか？
+
+`commitAndPush` という Phenyl Action を使ってみましょう。store を更新すると同時にサーバー側へも push することができます。
+
+```ts
+await store.dispatch(
+  actions.commitAndPush({
+    entityName: 'taskCollection',
+    id: 'task-collection-1',
+    operation: addTaskOp,
+  })
+)
+
+const state = store.getState().phenyl
+
+console.log(JSON.stringify(state.entities.taskCollection, null, 2))
+```
+
+実行してみましょう。
+
+```json
+{
+  "task-collection-1": {
+    "origin": {
+      "id": "task-collection-1",
+      "taskList": [
+        {
+          "id": "TID-1",
+          "name": "Do hands-on",
+          "status": "TODO"
+        },
+        {
+          "id": "TID-2",
+          "name": "Create store",
+          "status": "WIP"
+        }
+      ]
+    },
+    "versionId": "0kqgj9wnxjRPzNVat1BW1kFj",
+    "commits": [],
+    "head": null
+  }
+}
+```
+
+store は更新されてますね！サーバーの状態も確認してみましょう。
+
+```ts
+const main = async () => {
+  const client = new PhenylHttpClient<MyTypeMap>({
+    url: 'http://localhost:8080',
+  })
+
+  const personCollection = await client.find({
+    entityName: 'personCollection',
+    where: {},
+  })
+
+  const taskCollection = await client.find({
+    entityName: 'taskCollection',
+    where: {},
+  })
+
+  console.log(JSON.stringify({ personCollection, taskCollection }, null, 2))
+}
+```
+
+```json
+{
+  "personCollection": {
+    "entities": [
+      {
+        "id": "person-collection-1",
+        "personList": [
+          {
+            "id": "PID-1",
+            "name": "a"
+          },
+          {
+            "id": "PID-2",
+            "name": "b"
+          }
+        ]
+      }
+    ],
+    "versionsById": {
+      "person-collection-1": "0kqgjbav9HszFcRM68GRTMKZ"
+    }
+  },
+  "taskCollection": {
+    "entities": [
+      {
+        "id": "task-collection-1",
+        "taskList": [
+          {
+            "id": "TID-1",
+            "name": "Do hands-on",
+            "status": "TODO"
+          },
+          {
+            "id": "TID-2",
+            "name": "Create store",
+            "status": "WIP"
+          }
+        ]
+      }
+    ],
+    "versionsById": {
+      "task-collection-1": "0kqgjbavmddH1l4b1xZYrRFT"
+    }
+  }
+}
+```
+
+サーバー側も更新されてそうです。
+
+## おわり
+
+力尽きたのでここでオワリにします。

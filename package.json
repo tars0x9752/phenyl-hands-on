@@ -8,7 +8,7 @@
     "lib/**/*"
   ],
   "scripts": {
-    "start": "ts-node src/index.ts",
+    "client": "ts-node src/client.ts",
     "serve": "ts-node src/server.ts",
     "build": "tsc",
     "format": "prettier --write \"src/**/*.ts\"",
