@@ -28,11 +28,11 @@ import { createEntityClient } from '@phenyl/memory-db'
 const entityClient = createEntityClient()
 ```
 
-`Phenyl` の世界で言う `Entity` とは、MongoDB にドキュメントとして保存される、 `id` により同一性を持つオブジェクトを指します。
+`Phenyl` の世界に登場する `Entity` とは、`id` による同一性を持つオブジェクトで、MongoDB にドキュメントとして保存されるもののこと指しいます。
 
-コレクションのスキーマ、あるいは RDB の ORM で言うところの **テーブルスキーマモデルみたいなもの** と思うとわかりやすいかもしれません。
+イメージとしてはコレクションのスキーマモデルといったところでしょうか。
 
-> 混乱を避けるため、必ずしも 「DDD のエンティティ = `Phenyl` の `Entity`」 ではないということを明示的に書いておきます。
+DDD のエンティティというよりは RDB の ORM のエンティティに近く、RDB でいうところの **テーブルスキーマモデルみたいなもの** と思うとわかりやすいかもしれません。
 
 このハンズオンでは例としてタスク管理システムを作っていくことにします。
 
@@ -42,28 +42,23 @@ const entityClient = createEntityClient()
 
 ```ts
 export type PersonId = `PID-${string}`
-
 export type Person = {
   id: PersonId
   name: string
 }
-
 export type PersonCollection = {
   id: string
   personList: Person[]
 }
 
 export type TaskStatus = 'DONE' | 'WIP' | 'TODO'
-
 export type TaskId = `TID-${string}`
-
 export type Task = {
   id: TaskId
   name: string
   status: TaskStatus
   assignee?: PersonId
 }
-
 export type TaskCollection = {
   id: string
   taskList: Task[]
