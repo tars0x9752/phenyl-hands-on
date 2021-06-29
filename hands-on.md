@@ -313,9 +313,7 @@ export interface MyTypeMap extends GeneralTypeMap {
 
 です。
 
-今回のタスク管理システムでは、`authenticate` 機能を持つ `Entity` は要らないので、`nonUsers` だけ使います。
-
-> FunctionalGroup の細かい機能についてはここではこれ以上深追いしませんが、気になる方は型定義を除いてみてください。
+今回のタスク管理システムでは、`authenticate` 機能を持たない `Entity` だけを使うので、以下のように `nonUsers` のみを定義します。
 
 ```ts
 const functionalGroup: FunctionalGroup<MyTypeMap> = {
@@ -328,6 +326,8 @@ const functionalGroup: FunctionalGroup<MyTypeMap> = {
   customQueries: {},
 }
 ```
+
+> また、必要に応じてそれぞれの NonUsers Entity について `EntityDefinition` を extends した class を定義する必要がありますが、今回の用途では不要なので `{}` で済ませています。気になる方は型定義を除いてみてください。
 
 `FunctionalGroup` と `TypeMap` を用意し、`PhenylRestApi` の準備までできました！🎉
 
